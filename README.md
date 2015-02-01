@@ -1,3 +1,5 @@
+#本程序还在开发当中，暂时不可用！
+
 ```
 1.0：
   Test version
@@ -34,8 +36,6 @@
   -- IN: vlan200
   -- OUT: switch>vlan200>
   -- IN: ip 192.168.2.2
-  -- OUT: switch>vlan200>
-  -- IN: ip 192.168.2.1
   -- OUT: switch>vlan200>
   
   switch.vlan200.gateway("192.168.2.1")
