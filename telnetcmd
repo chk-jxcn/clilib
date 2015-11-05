@@ -1,0 +1,79 @@
+#!/bin/env lua
+
+package.path="/root/clilib-master/?.lua"
+cb = require "clilib"
+
+ne={
+{{agt1 = {"172.16.30.13", "6007"}},
+{agt2 = {"172.16.30.14", "6007"}},name="AGT"},
+{{ts1 = {"172.16.30.13", "5002"}},
+{ts2 = {"172.16.30.14", "5002"}},name="TS"},
+{{tcf1 = {"172.16.30.11", "9006"}},
+{tcf2 = {"172.16.30.12", "9006"}},name="TCF"},
+{{tas1 = {"172.16.30.11", "8007"}},
+{tas2 = {"172.16.30.12", "8007"}},name="TAS"},
+{{smc1 = {"172.16.30.13", "16001"}},
+{smc2 = {"172.16.30.14", "16001"}},name="SMC"},
+{{emme1 = {"172.16.30.11", "5001"}},
+{emme2 = {"172.16.30.12", "5001"}},name="EMME"},
+{{ehss1 = {"172.16.30.13", "15001"}},
+{ehss2 = {"172.16.30.14", "15001"}},name="EHSS"},
+{{pcrf1 = {"172.16.30.13", "8006"}},
+{pcrf2 = {"172.16.30.14", "8006"}},name="PCRF"},
+}
+
+util=require "util"
+
+function ver(handle)
+	print(util.match(handle.ver(), {"Build"}))
+end
+
+function hashowconfig(handle)
+	print(util.match(handle.ha.showconfig(), {"Status", "Slot"}))
+end
+
+function telnetcmd(host, port, cmd)
+	local handle = cb.telnetcli(host, port)	
+	cb.login(handle, "admin", "admin")
+	-- if have a function equal first arg, call it
+	if type(_G[cmd[1]]) == "function" then
+		pcall(_G[cmd[1]], handle)
+	else
+	-- else call a.b.c, note that this call have no args. 
+		local v = handle
+		for _, subcmd in ipairs(cmd) do
+			v = v[subcmd]
+		end
+		pcall(function () print(({v()})[1]) end)
+	end
+end
+
+selected = nil
+
+for i, v in ipairs(arg) do
+	if v == "-n" then
+		selected = arg[i+1]
+		table.remove(arg, i)
+		if arg[i] then  table.remove(arg, i) end
+		break
+	end
+end
+
+for _, x in ipairs(ne) do
+	if (not selected) or (selected and string.upper(selected) == x.name) then
+		print("----" .. x.name .. "----------------------------------------")
+		for _,netype in ipairs(x) do
+			for n, v in pairs(netype) do
+				print("Telnet to " .. n .. ": "..v[1], " port: ", v[2])
+				ret, err = pcall(telnetcmd, v[1], v[2], arg)
+				if not ret then
+					if string.match(err, "interrupted") then
+						return
+					end
+					print("  Open telnet to " .. v[2] .. " fail")
+				end
+			end
+		end
+	else
+	end
+end

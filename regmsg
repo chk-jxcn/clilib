@@ -1,0 +1,26 @@
+#!/bin/env lua
+
+cb = require "clilib"
+lpeg = require "lpeg"
+
+--[[function match(s, key)
+	t = {}
+	for line in string.gmatch (s, "([^\r\n]*)\r\n") do -- split to lines
+		for _,v in pairs(key) do
+			if string.match(line, v) then
+				table.insert(t, line)
+			end
+		end
+	end
+	return  table.concat(t, "\r\n") 
+end
+--]]
+
+
+tcf = cb.telnetcli("168.0.70.12", "9006")
+--tcf.__debug=true
+cb.login(tcf,"admin","admin")
+re = tcf.bcp.showallmsgstat()
+print(re)
+
+

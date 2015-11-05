@@ -1,0 +1,55 @@
+#!./lua
+
+cb = require "clilib"
+
+
+
+
+function login(handle, user, pass)
+        handle.__stream:setnonblock(0)
+	local loginret, len = nil, nil
+        repeat
+                handle[user]() 
+                loginret, len = handle[pass]()
+                if string.match(loginret, "Login") or  string.match(loginret, "Pass") then
+                        if handle.__debug then
+                                print("Try lgoin again")
+                        end
+                        handle["\r\n"]()
+                else
+                        break
+                end
+         until nil
+	 if len == nil or len == 0 then
+		 error("login fail")
+	 end
+         handle.__stream:setnonblock(1)
+end
+
+util=require "util"
+
+function tainfo(host,port)
+	print "==========================================="
+	print("Try telnet to TMG: " .. host)
+	local tmg1 = cb.telnetcli(host, port)
+	login(tmg1, "admin", "admin")
+	sctpcli = tmg1.plat.sctpcli()
+	print(sctpcli)
+	print(util.match(tmg1.plat.tainfo(), {"SlotID", "TsFlag", "TraceID"}))
+end
+
+tmg = {
+	"172.16.0.3",
+	"172.16.0.4",
+	"172.16.0.11",
+	"172.16.0.12",
+}
+
+for _, host in ipairs(tmg) do
+	ret = pcall(tainfo, host, "9007")
+	if not ret then 
+		print("TMG: " .. host .. " connect fail")
+	end
+end
+
+

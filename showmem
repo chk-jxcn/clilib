@@ -1,0 +1,43 @@
+#!/bin/env lua
+
+cb = require "clilib"
+lpeg = require "lpeg"
+spawn=require "spawn"
+
+tcf = cb.telnetcli("172.16.0.4", "9006")
+--tcf.__debug=true
+cb.login(tcf,"admin","admin")
+
+function printandwritetofile(s)
+	if not file then
+		file = io.open(filename, "w+")
+		file:write(s .. "\n")
+	end
+	io.write(s .. "\n")
+end
+
+--for k,v in pairs(arg) do print (k .. v) end
+
+if arg[1] then
+	filename = arg[1]
+	print = printandwritetofile
+end
+function showmem()
+repeat
+	re = tcf.prtl.ssi.showmemory()
+	print'-------------------------------------------------------'
+	print(os.date())
+	print'-------------------------------------------------------'
+	print(re)
+	spawn.usleep(2000000)
+until nil
+
+end
+
+re = pcall(showmem)
+if not re and file then
+	file:flush()
+	file:close()
+
+end
+

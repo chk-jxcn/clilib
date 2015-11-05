@@ -1,0 +1,14 @@
+#!/bin/env lua
+
+cb = require "clilib"
+
+dcs = cb.telnetcli("172.16.30.14", "5005")
+--tcf.__debug=true
+cb.login(dcs,"admin","admin")
+repeat
+re = dcs.prtl.sip.state.showcallcbsts()
+print(re)
+spawn.usleep(1000000)
+until nil
+
+
