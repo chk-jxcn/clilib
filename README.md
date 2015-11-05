@@ -1,6 +1,12 @@
-#本程序还在开发当中，暂时不可用！
+#信威内部用来自动化telnet cli的工具
+
+  实际例子参考showmem、telnetcmd等
+
 
 ```
+1.1：
+  已经实际使用一段时间，非阻塞读。
+
 1.0：
   Test version
   使用stdio测试
@@ -69,6 +75,13 @@
   增加一个通过cli自省自动获取cli各层提供的命令的描述结构的库。
   例如可以通过输出？来遍历cli所有命令空间。
   
-  
+##License  
+
+  None
+
+
+##Contact
+
+  chk.jxcn#gmail.com
   
 
